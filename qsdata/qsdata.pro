@@ -7,8 +7,6 @@ include(../qsdata.pri)
 
 QT       += core gui widgets printsupport
 
-CONFIG += c++11
-
 TARGET = qsdata
 TEMPLATE = app
 
