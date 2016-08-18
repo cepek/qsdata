@@ -1,0 +1,45 @@
+/*
+  Qsdata project
+  Copyright (C) 2016 Ales Cepek <cepek@gnu.org>
+
+  This file is part of Qsdata.
+
+  Qsdata is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Qsdata is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Qsdata.  If not, see <http://www.gnu.org/licenses/>.
+
+ */
+
+#ifndef SPECTRALSAMPLEETALON_H
+#define SPECTRALSAMPLEETALON_H
+
+#include "spectraldata.h"
+#include <vector>
+
+class SpectralSampleEtalon
+{
+public:
+    SpectralSampleEtalon(std::vector<SpectralData*> samples
+                        =std::vector<SpectralData*>());
+
+    void push_back(SpectralData* sd);
+    std::vector<SpectralData*> samples() const;
+
+    SpectralData average();
+    SpectralData median();
+
+    void clear();
+private:
+    std::vector<SpectralData*> samples_;
+};
+
+#endif // SPECTRALSAMPLEETALON_H
