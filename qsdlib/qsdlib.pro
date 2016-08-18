@@ -11,6 +11,7 @@ QT       += widgets printsupport
 TARGET = qsdlib
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += c++11
 
 SOURCES += qsdlib.cpp \
     qcustomplot.cpp \

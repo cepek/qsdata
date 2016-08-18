@@ -7,6 +7,8 @@ include(../qsdata.pri)
 
 QT       += core gui widgets printsupport
 
+CONFIG += c++11
+
 TARGET = qsdata
 TEMPLATE = app
 
@@ -14,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     samplestoetalon.cpp \
     notes.cpp \
-    qsdatasettings.cpp
+    qsdatasettings.cpp \
+    version.cpp
 
 HEADERS += mainwindow.h \
     samplestoetalon.h \
     notes.h \
-    qsdatasettings.h
+    qsdatasettings.h \
+    version.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qsdlib/release/ -lqsdlib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../qsdlib/debug/ -lqsdlib

@@ -23,6 +23,7 @@
 #include "samplestoetalon.h"
 #include "qsdlib.h"
 #include "parameters.h"
+#include "version.h"
 
 #include <limits>
 #include <fstream>
@@ -80,6 +81,14 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
 
     // Tools menu
     QMenu* menuTools = menuBar->addMenu(tr("&Tools"));
+
+    // Help menu
+    QMenu* menuHelp = menuBar->addMenu(tr("&Help"));
+    action = menuHelp->addAction(tr("&About Qsdata"));
+    connect(action, &QAction::triggered, [this](){
+        QMessageBox msgBox;
+        msgBox.setText("Qsdata version " + QString(Version::version().c_str()));
+        msgBox.exec();});
 
     SamplesToEtalon* samples = new SamplesToEtalon(this);
     samples->setEtalonsMinX(parameters.etalonsMinX());
