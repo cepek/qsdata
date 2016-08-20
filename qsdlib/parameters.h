@@ -30,12 +30,13 @@ public:
     Parameters();
 
     void setImplicitValues();
+    void setSettingsValues();
 
     double etalonsMinX() const;
     bool   continuumRemoval() const;
 
     void setEtalonsMinx(double minx=0);
-    void setContinuumRemovat(bool contrem=false);
+    void setContinuumRemoval(bool contrem=false);
 
 private:
     double etalonsMinX_;

@@ -35,6 +35,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName   ("qsdata");
 
     Parameters parameters;
+    parameters.setSettingsValues();
+
     QSDataSettings qsds(parameters);
     qsds.setSizeGripEnabled(true);
     qsds.exec();

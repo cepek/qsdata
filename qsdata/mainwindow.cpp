@@ -33,6 +33,7 @@
 #include <QHeaderView>
 #include <QFile>
 #include <QTableWidgetItem>
+#include <QSettings>
 #include <QDebug>
 
 MainWindow::MainWindow(Parameters params, QWidget *parent) :
@@ -142,6 +143,9 @@ MainWindow::~MainWindow()
     settings.setValue("mainWindow/sizeHeight", size().height());
     settings.setValue("mainWindow/posX",       x());
     settings.setValue("mainWindow/posY",       y());
+
+    settings.setValue("parameters/etalonsMinX",      parameters.etalonsMinX());
+    settings.setValue("parameters/continuumRemoval", parameters.continuumRemoval());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

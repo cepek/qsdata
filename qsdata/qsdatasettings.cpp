@@ -32,7 +32,7 @@
 QSDataSettings::QSDataSettings(Parameters& params, QWidget *parent)
     : QDialog(parent), parameters(params)
 {
-    QLayout* vbox = new QGridLayout; //QVBoxLayout(this);
+    QLayout* vbox = new QGridLayout;
     QFormLayout* form = new QFormLayout;
     form->setLabelAlignment(Qt::AlignLeft);
     form->setHorizontalSpacing(15);
@@ -42,13 +42,13 @@ QSDataSettings::QSDataSettings(Parameters& params, QWidget *parent)
     form->addRow(tr("Continuum removal"), checkBox_continuum_removal);
     vbox->addItem(form);
 
-    auto setImplicitValues = [this](){
-        parameters.setImplicitValues();
+    auto setDialogButtonBoxValues = [this](bool initParameters){
+        if(initParameters) parameters.setImplicitValues();
         lineEdit_etalon_min_x->setText(QString::number(parameters.etalonsMinX()));
         checkBox_continuum_removal->setChecked(parameters.continuumRemoval());
     };
 
-    setImplicitValues();
+    setDialogButtonBoxValues(false);
 
     QDialogButtonBox* bbox = new QDialogButtonBox(
                 //QDialogButtonBox::Apply |
@@ -73,12 +73,12 @@ QSDataSettings::QSDataSettings(Parameters& params, QWidget *parent)
             return;
         }
         parameters.setEtalonsMinx(minx);
-        parameters.setContinuumRemovat(checkBox_continuum_removal->isChecked());
+        parameters.setContinuumRemoval(checkBox_continuum_removal->isChecked());
         this->close();});
     connect(bbox, &QDialogButtonBox::clicked,
-            [this,bbox,setImplicitValues](QAbstractButton* b){
+            [this,bbox,setDialogButtonBoxValues](QAbstractButton* b){
         if (bbox->button(QDialogButtonBox::Reset) == b) {
-            setImplicitValues();
+            setDialogButtonBoxValues(true);
         }
     });
 }
