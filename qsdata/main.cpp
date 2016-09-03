@@ -30,6 +30,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    QIcon icon(":/img/sd-icon.png");
+    a.setWindowIcon(icon);
+
     QCoreApplication::setOrganizationName  ("qsdata");
     QCoreApplication::setOrganizationDomain("geomatics.fsv.cvut.cz");
     QCoreApplication::setApplicationName   ("qsdata");

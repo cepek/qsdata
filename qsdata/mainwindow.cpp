@@ -88,7 +88,8 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
     action = menuHelp->addAction(tr("&About Qsdata"));
     connect(action, &QAction::triggered, [this](){
         QMessageBox msgBox;
-        msgBox.setText("Qsdata version " + QString(Version::version().c_str()));
+        msgBox.setIconPixmap(windowIcon().pixmap(iconSize().width()*2));
+        msgBox.setText("<p>Qsdata version " + QString(Version::version().c_str()) + "</p>");
         msgBox.exec();});
 
     SamplesToEtalon* samples = new SamplesToEtalon(this);

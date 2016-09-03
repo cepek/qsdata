@@ -35,3 +35,6 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qsdl
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qsdlib/release/qsdlib.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../qsdlib/debug/qsdlib.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../qsdlib/libqsdlib.a
+
+RESOURCES += \
+    qsdata.qrc
