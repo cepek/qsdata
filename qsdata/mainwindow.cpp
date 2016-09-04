@@ -87,9 +87,25 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
     QMenu* menuHelp = menuBar->addMenu(tr("&Help"));
     action = menuHelp->addAction(tr("&About Qsdata"));
     connect(action, &QAction::triggered, [this](){
+
         QMessageBox msgBox;
         msgBox.setIconPixmap(windowIcon().pixmap(iconSize().width()*2));
-        msgBox.setText("<p>Qsdata version " + QString(Version::version().c_str()) + "</p>");
+        msgBox.setText("<p><b>Qsdata " + QString(Version::version().c_str()) + "</b></p>"
+                       "<p>Based on Qt " + QT_VERSION_STR + ""
+#                      define str(s)  # s
+#                      define xstr(s) str(s)
+#                      if defined (__GNUC__)
+                       " (on GNU/Linux g++ " xstr(__GNUC__) "." xstr(__GNUC_MINOR__) "." xstr(__GNUC_PATCHLEVEL__) ")"
+#                      elif defined (_MSC_VER)
+                       " (on MSVC " xstr(_MSC_VER) ")"
+#                      endif
+                       "</p>"
+                       "<p>Built on " + __DATE__ + " " + __TIME__ + "</p>"
+                       "<p>Copyright (C) 2016 Aleš Čepek</p><p>"
+                       "License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;<br/>" +
+                       "This is free software: you are free to change and redistribute it.<br/>" +
+                       "There is NO WARRANTY, to the extent permitted by law.<p>"
+                       );
         msgBox.exec();});
 
     SamplesToEtalon* samples = new SamplesToEtalon(this);
