@@ -95,9 +95,16 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
 #                      define str(s)  # s
 #                      define xstr(s) str(s)
 #                      if defined (__GNUC__)
-                       " (on GNU/Linux g++ " xstr(__GNUC__) "." xstr(__GNUC_MINOR__) "." xstr(__GNUC_PATCHLEVEL__) ")"
+                       " (GCC " xstr(__GNUC__) "." xstr(__GNUC_MINOR__) "." xstr(__GNUC_PATCHLEVEL__) ")"
 #                      elif defined (_MSC_VER)
-                       " (on MSVC " xstr(_MSC_VER) ")"
+                       " (MSVC"
+#                      if _MSC_VER == 1900
+                       " 2015"
+#                      endif
+#                      if defined (_WIN64)
+                       ", 64bit"
+#                      endif
+                       ")"
 #                      endif
                        "</p>"
                        "<p>Built on " + __DATE__ + " " + __TIME__ + "</p>"
