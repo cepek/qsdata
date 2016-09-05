@@ -38,6 +38,8 @@ QSDataSettings::QSDataSettings(Parameters& params, QWidget *parent)
     form->setHorizontalSpacing(15);
     lineEdit_etalon_min_x = new QLineEdit;
     form->addRow(tr("Etalon min. X"), lineEdit_etalon_min_x);
+    lineEdit_etalon_max_x = new QLineEdit;
+    form->addRow(tr("Etalon max. X (ignored if 0)"), lineEdit_etalon_max_x);
     checkBox_continuum_removal = new QCheckBox;
     form->addRow(tr("Continuum removal"), checkBox_continuum_removal);
     vbox->addItem(form);
@@ -45,6 +47,7 @@ QSDataSettings::QSDataSettings(Parameters& params, QWidget *parent)
     auto setDialogButtonBoxValues = [this](bool initParameters){
         if(initParameters) parameters.setImplicitValues();
         lineEdit_etalon_min_x->setText(QString::number(parameters.etalonsMinX()));
+        lineEdit_etalon_max_x->setText(QString::number(parameters.etalonsMaxX()));
         checkBox_continuum_removal->setChecked(parameters.continuumRemoval());
     };
 
@@ -72,7 +75,17 @@ QSDataSettings::QSDataSettings(Parameters& params, QWidget *parent)
             QMessageBox::critical(this,"Etalon min. x","cannot be negative");
             return;
         }
-        parameters.setEtalonsMinx(minx);
+        double maxx = lineEdit_etalon_max_x->text().toDouble(&ok);
+        if (!ok) {
+            QMessageBox::critical(this,"Etalon max. x","not a number");
+            return;
+        }
+        if (maxx != 0 && (maxx < 0 || maxx <= minx)) {
+            QMessageBox::critical(this,"Etalon max. x","cannot be negative or less than or equal to min. x");
+            return;
+        }
+        parameters.setEtalonsMinX(minx);
+        parameters.setEtalonsMaxX(maxx);
         parameters.setContinuumRemoval(checkBox_continuum_removal->isChecked());
         this->close();});
     connect(bbox, &QDialogButtonBox::clicked,

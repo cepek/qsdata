@@ -40,6 +40,7 @@ public slots:
 private:
     Parameters& parameters;
     QLineEdit* lineEdit_etalon_min_x;
+    QLineEdit* lineEdit_etalon_max_x;
     QCheckBox* checkBox_continuum_removal;
 };
 

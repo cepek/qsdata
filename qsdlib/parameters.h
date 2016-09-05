@@ -33,13 +33,20 @@ public:
     void setSettingsValues();
 
     double etalonsMinX() const;
+    double etalonsMaxX() const;
     bool   continuumRemoval() const;
 
-    void setEtalonsMinx(double minx=0);
+    void setEtalonsMinX(double minx=0);
+    void setEtalonsMaxX(double maxx=0);
     void setContinuumRemoval(bool contrem=false);
 
 private:
+    /* see also
+     *      QSDataSettings::QSDataSettings
+     *      MainWindow::~MainWindow
+     */
     double etalonsMinX_;
+    double etalonsMaxX_;
     bool   continuumRemoval_;
 };
 

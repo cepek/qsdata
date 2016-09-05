@@ -169,6 +169,7 @@ MainWindow::~MainWindow()
     settings.setValue("mainWindow/posY",       y());
 
     settings.setValue("parameters/etalonsMinX",      parameters.etalonsMinX());
+    settings.setValue("parameters/etalonsMaxX",      parameters.etalonsMaxX());
     settings.setValue("parameters/continuumRemoval", parameters.continuumRemoval());
 }
 

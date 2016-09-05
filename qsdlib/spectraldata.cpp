@@ -152,7 +152,7 @@ void SpectralData::continuumRemoval()
     QVector<double> r(N);
 
     int minIndX {};
-    for (minIndX = 0; x[minIndX] < 1200 && minIndX<N; minIndX++) {
+    for (minIndX = 0; x[minIndX] < -1200 && minIndX<N; minIndX++) {
         r[minIndX] = y[minIndX];
     }
 
