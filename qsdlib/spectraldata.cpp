@@ -152,15 +152,16 @@ void SpectralData::continuumRemoval()
     QVector<double> r(N);
 
     int minIndX {};
-    for (minIndX = 0; x[minIndX] < -1200 && minIndX<N; minIndX++) {
+    r = y; // ************
+#if 0
+    for (minIndX = 0; minIndX<N; minIndX++) {
         r[minIndX] = y[minIndX];
     }
-
+#endif
     double px = x[minIndX];
     double py = y[minIndX];
-    qDebug() << "???" << minIndX << px << py;
     r[minIndX] = py;
-    qDebug() << "..." << minIndX << x[minIndX] << r[minIndX];
+
     for (int i=minIndX+1; i<N-1; i++)
     {
         bool test = true;
@@ -192,7 +193,6 @@ void SpectralData::continuumRemoval()
             while (j <= i) {
                 r[minIndX+1] = (y0 + dy*(x[j]-x0));
                 minIndX++;
-                qDebug() << "..." << minIndX << x[minIndX] << r[minIndX];
                 j++;
             }
         }
@@ -206,8 +206,6 @@ void SpectralData::continuumRemoval()
     while (j <= i) {
         r[minIndX+1] = (y0 + dy*(x[j]-x0));
         minIndX++;
-        qDebug() << "..." << minIndX << x[minIndX] << r[minIndX];
-
         j++;
     }
     for (int i=0; i<r.size(); i++)
