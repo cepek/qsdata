@@ -21,6 +21,7 @@
 
 #include "mainwindow.h"
 #include "parameters.h"
+#include "parameterseditor.h"
 #include "qsdatasettings.h"
 #include <QApplication>
 #include <QMessageBox>
@@ -37,15 +38,19 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("geomatics.fsv.cvut.cz");
     QCoreApplication::setApplicationName   ("qsdata");
 
-    Parameters parameters;
-    parameters.setSettingsValues();
+    bool accepted {false};
+    {
+        QSDataSettings qsds;
+        QObject::connect(&qsds, &QSDataSettings::rejected, [&accepted](){accepted=false;});
+        QObject::connect(&qsds, &QSDataSettings::accepted, [&accepted](){accepted=true;});
+        qsds.setSizeGripEnabled(true);
+        qsds.exec();
+    }
 
-    QSDataSettings qsds(parameters);
-    qsds.setSizeGripEnabled(true);
-    qsds.exec();
-
-    MainWindow w(parameters);
-    w.show();
-
-    return a.exec();
+    if (accepted)
+    {
+        MainWindow w;
+        w.show();
+        return a.exec();
+    }
 }

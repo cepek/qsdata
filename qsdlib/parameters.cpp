@@ -2,6 +2,13 @@
 #include <QSettings>
 #include <QDebug>
 
+Parameters Parameters::global;
+
+void Parameters::setGlobal() const
+{
+    global = *this;
+}
+
 Parameters::Parameters()
 {
         setImplicitValues();
@@ -17,15 +24,22 @@ void Parameters::setImplicitValues()
 void Parameters::setSettingsValues()
 {
     QSettings settings;
-    if (settings.childGroups().contains("parameters",Qt::CaseInsensitive)) {
-        etalonsMinX_ = settings.value("parameters/etalonsMinX").toDouble();
+    if (!settingsName().isEmpty()) {
+        settings.beginGroup(settingsName());
+        etalonsMinX_ = settings.value("parameters_etalonsMinX").toDouble();
         if (etalonsMinX_ < 0) etalonsMinX_ = 0;
-        etalonsMaxX_ = settings.value("parameters/etalonsMaxX").toDouble();
+        etalonsMaxX_ = settings.value("parameters_etalonsMaxX").toDouble();
         if (etalonsMaxX_ == 0 || etalonsMaxX_ <= etalonsMinX_) etalonsMaxX_ = 0;
-        continuumRemoval_ = settings.value("parameters/continuumRemoval").toBool();
+        continuumRemoval_ = settings.value("parameters_continuumRemoval").toBool();
+        settings.endGroup();
     } else {
         setImplicitValues();
     }
+}
+
+QString Parameters::settingsName() const
+{
+    return settingsName_;
 }
 
 double Parameters::etalonsMinX() const
@@ -41,6 +55,11 @@ double Parameters::etalonsMaxX() const
 bool Parameters::continuumRemoval() const
 {
     return continuumRemoval_;
+}
+
+void Parameters::setSettingsName(QString name)
+{
+    settingsName_ = name;
 }
 
 void Parameters::setEtalonsMinX(double minx)

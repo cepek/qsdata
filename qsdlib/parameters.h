@@ -32,22 +32,28 @@ public:
     void setImplicitValues();
     void setSettingsValues();
 
-    double etalonsMinX() const;
-    double etalonsMaxX() const;
-    bool   continuumRemoval() const;
+    QString settingsName() const;
+    double  etalonsMinX() const;
+    double  etalonsMaxX() const;
+    bool    continuumRemoval() const;
 
+    void setSettingsName(QString name=QString());
     void setEtalonsMinX(double minx=0);
     void setEtalonsMaxX(double maxx=0);
     void setContinuumRemoval(bool contrem=false);
 
+    static Parameters global;
+    void   setGlobal() const;
+
 private:
     /* see also
-     *      QSDataSettings::QSDataSettings
      *      MainWindow::~MainWindow
+     *      ParametersEditor::ParameterEditor
      */
-    double etalonsMinX_;
-    double etalonsMaxX_;
-    bool   continuumRemoval_;
+    QString settingsName_;
+    double  etalonsMinX_;
+    double  etalonsMaxX_;
+    bool    continuumRemoval_;
 };
 
 #endif // PARAMETERS_H

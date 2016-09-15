@@ -44,12 +44,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Parameters params, QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 private:
-    Parameters parameters;
-
     QTableWidget* table;
     bool tableHasChanged   {false};
     QVector<SpectralData*> etalons;    

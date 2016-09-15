@@ -70,19 +70,20 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
     int px = settings.value("sampleToEtalon/posX").toInt();
     int py = settings.value("sampleToEtalon/posY").toInt();
     if (bothPositive(px, py)) move(px, py);
-
-    qDebug() << "SamplesToEtalon::SamplesToEtalon(QWidget *parent)";
 }
 
 SamplesToEtalon::~SamplesToEtalon()
 {
-    QSettings settings;
-    settings.setValue("sampleToEtalon/sizeWidth" , size().width());
-    settings.setValue("sampleToEtalon/sizeHeight", size().height());
-    settings.setValue("sampleToEtalon/posX",       x());
-    settings.setValue("sampleToEtalon/posY",       y());
-
-    qDebug() << "SamplesToEtalon::~SamplesToEtalon()";
+    QString name = Parameters::global.settingsName();
+    if (!name.isEmpty()) {
+        QSettings settings;
+        settings.beginGroup(name);
+        settings.setValue("sampleToEtalon_sizeWidth" , size().width());
+        settings.setValue("sampleToEtalon_sizeHeight", size().height());
+        settings.setValue("sampleToEtalon_posX",       x());
+        settings.setValue("sampleToEtalon_posY",       y());
+        settings.endGroup();
+    }
 }
 
 void SamplesToEtalon::read()
@@ -104,7 +105,7 @@ void SamplesToEtalon::read()
         QFileInfo info(files[0]);
         QDir dir = info.dir();
         dir.cdUp();
-        settings.setValue("directory/samples", dir.absolutePath());
+        settings.setValue("directory_samples", dir.absolutePath());
     }
 
     double xMin {std::numeric_limits<double>::max()};
@@ -190,7 +191,7 @@ void SamplesToEtalon::save()
     if (slist.size() != 1) return;
 
     directoryEtalons = dialog.directory().path();
-    settings.setValue("directory/etalons", directoryEtalons);
+    settings.setValue("directory_etalons", directoryEtalons);
 
     QString name = slist[0];
     QFileInfo info(name);

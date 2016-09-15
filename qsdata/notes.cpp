@@ -20,6 +20,7 @@
  */
 
 #include "notes.h"
+#include "parameters.h"
 
 #include <QTextEdit>
 #include <QLayout>
@@ -50,22 +51,30 @@ Notes::Notes(QWidget *parent) : QMainWindow(parent)
     // restore window's settings from the last session
     auto bothPositive = [](int a, int b) {return a >0 && b>0; };
     QSettings settings;
+    settings.beginGroup(Parameters::global.settingsName());
 
-    int w = settings.value("notes/sizeWidth" ).toInt();
-    int h = settings.value("notes/sizeHeight").toInt();
+    int w = settings.value("notes_sizeWidth" ).toInt();
+    int h = settings.value("notes_sizeHeight").toInt();
     if (bothPositive(w, h)) resize(w, h);
     else                    resize(600,400);
 
-    int px = settings.value("notes/posX").toInt();
-    int py = settings.value("notes/posY").toInt();
+    int px = settings.value("notes_posX").toInt();
+    int py = settings.value("notes_posY").toInt();
     if (bothPositive(px, py)) move(px, py);
+
+    settings.endGroup();
 }
 
 Notes::~Notes()
 {
-    QSettings settings;
-    settings.setValue("notes/sizeWidth" , size().width());
-    settings.setValue("notes/sizeHeight", size().height());
-    settings.setValue("notes/posX",       x());
-    settings.setValue("notes/posY",       y());
+    QString name = Parameters::global.settingsName();
+    if (!name.isEmpty()) {
+        QSettings settings;
+        settings.beginGroup(name);
+        settings.setValue("notes_sizeWidth" , size().width());
+        settings.setValue("notes_sizeHeight", size().height());
+        settings.setValue("notes_posX",       x());
+        settings.setValue("notes_posY",       y());
+        settings.endGroup();
+    }
 }

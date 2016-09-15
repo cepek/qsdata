@@ -31,14 +31,17 @@ class QSDataSettings : public QDialog
 {
     Q_OBJECT
 public:
-    explicit QSDataSettings(Parameters& params, QWidget *parent = 0);
+    explicit QSDataSettings(QWidget *parent = 0);
+
+    Parameters parameters;
 
 signals:
+    void accepted();
+    void rejected();
 
 public slots:
 
 private:
-    Parameters& parameters;
     QLineEdit* lineEdit_etalon_min_x;
     QLineEdit* lineEdit_etalon_max_x;
     QCheckBox* checkBox_continuum_removal;

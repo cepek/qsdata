@@ -34,11 +34,10 @@
 #include <QFile>
 #include <QTableWidgetItem>
 #include <QSettings>
+#include <QDateTime>
 #include <QDebug>
 
-MainWindow::MainWindow(Parameters params, QWidget *parent) :
-    QMainWindow(parent),
-    parameters(params)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     QAction* action {nullptr};
     QMenuBar* menuBar = new QMenuBar(this);
@@ -116,22 +115,25 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
         msgBox.exec();});
 
     SamplesToEtalon* samples = new SamplesToEtalon(this);
-    samples->setEtalonsMinX(parameters.etalonsMinX());
+    samples->setEtalonsMinX(Parameters::global.etalonsMinX());
     action = menuTools->addAction(tr("&Samples to Etalon"));
     connect(action, &QAction::triggered, [samples](){samples->show();});
 
 
     auto bothPositive = [](int a, int b) {return a >0 && b>0; };
-    QSettings settings;
 
-    int w = settings.value("mainWindow/sizeWidth" ).toInt();
-    int h = settings.value("mainWindow/sizeHeight").toInt();
+    QString name = Parameters::global.settingsName();
+    QSettings settings;
+    settings.beginGroup(name);
+    int w = settings.value("mainWindow_sizeWidth" ).toInt();
+    int h = settings.value("mainWindow_sizeHeight").toInt();
     if (bothPositive(w, h)) resize(w, h);
     else                    resize(300,100);
 
-    int px = settings.value("mainWindow/posX").toInt();
-    int py = settings.value("mainWindow/posY").toInt();
+    int px = settings.value("mainWindow_posX").toInt();
+    int py = settings.value("mainWindow_posY").toInt();
     if (bothPositive(px, py)) move(px, py);
+    settings.endGroup();
 
     notes = new Notes(this);
 
@@ -154,7 +156,7 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
 
     readAllEtalons();
 
-    if (parameters.continuumRemoval())
+    if (Parameters::global.continuumRemoval())
         setWindowTitle("qsdata - continuum removal is used to normalize reflectance spectra");
     else
         setWindowTitle("qsdate - continuum removal is not used to normalize reflectance spectra");
@@ -162,15 +164,21 @@ MainWindow::MainWindow(Parameters params, QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    QSettings settings;
-    settings.setValue("mainWindow/sizeWidth" , size().width());
-    settings.setValue("mainWindow/sizeHeight", size().height());
-    settings.setValue("mainWindow/posX",       x());
-    settings.setValue("mainWindow/posY",       y());
-
-    settings.setValue("parameters/etalonsMinX",      parameters.etalonsMinX());
-    settings.setValue("parameters/etalonsMaxX",      parameters.etalonsMaxX());
-    settings.setValue("parameters/continuumRemoval", parameters.continuumRemoval());
+    QString name = Parameters::global.settingsName();
+    if (!name.isEmpty())
+    {
+        QSettings settings;
+        settings.beginGroup(name);
+        settings.setValue("mainWindow_dateTime",    QDateTime::currentDateTime().toTime_t());
+        settings.setValue("mainWindow_sizeWidth" ,  size().width());
+        settings.setValue("mainWindow_sizeHeight",  size().height());
+        settings.setValue("mainWindow_posX",        x());
+        settings.setValue("mainWindow_posY",        y());
+        settings.setValue("parameters_etalonsMinX", Parameters::global.etalonsMinX());
+        settings.setValue("parameters_etalonsMaxX", Parameters::global.etalonsMaxX());
+        settings.setValue("parameters_continuumRemoval", Parameters::global.continuumRemoval());
+        settings.endGroup();
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -258,14 +266,17 @@ void MainWindow::readEtalons(const QStringList &files)
     if (etalons.size() > 0) {
         const QVector<double>& x = etalons[0]->x;
         for (etalonsMinIndex=0; etalonsMinIndex<x.size(); etalonsMinIndex++)
-            if (x[etalonsMinIndex] >= parameters.etalonsMinX()) break;
+            if (x[etalonsMinIndex] >= Parameters::global.etalonsMinX()) break;
     }
 }
 
 void MainWindow::readAllEtalons()
 {
+    QString name = Parameters::global.settingsName();
     QSettings settings;
-    QString dir = settings.value("directory/etalons").toString();
+    settings.beginGroup(name);
+    QString dir = settings.value("directory_etalons").toString();
+    settings.endGroup();
     if (dir.isEmpty()) return;
 
     QStringList files;
@@ -282,8 +293,11 @@ void MainWindow::readAllEtalons()
 
 void MainWindow::readSelectedEtalons()
 {
+    QString name = Parameters::global.settingsName();
     QSettings settings;
-    QString directoryEtalons = settings.value("directory/etalons").toString();
+    settings.beginGroup(name);
+    QString directoryEtalons = settings.value("directory_etalons").toString();
+    settings.endGroup();
 
     QFileDialog dialog(this, tr("Read Etalons"));
     dialog.setDirectory(directoryEtalons);
@@ -295,7 +309,9 @@ void MainWindow::readSelectedEtalons()
     if (files.size() > 0) {
         QFileInfo info(files[0]);
         QDir dir = info.dir();
-        settings.setValue("directory/etalons", dir.absolutePath());
+        settings.beginGroup(name);
+        settings.setValue("directory_etalons", dir.absolutePath());
+        settings.endGroup();
     }
     else {
         return;   // this should never happen
@@ -328,8 +344,11 @@ void MainWindow::linearEtalonSearch()
 {
     qDebug() << "MainWindow::linearEtalonSearch()";
 
+    QString name = Parameters::global.settingsName();
     QSettings settings;
-    QString directorySamples = settings.value("directory/samples").toString();
+    settings.beginGroup(name);
+    QString directorySamples = settings.value("directory_samples").toString();
+    settings.endGroup();
 
     QFileDialog dialog(this, tr("Read Samples"));
     dialog.setDirectory(directorySamples);
@@ -344,7 +363,11 @@ void MainWindow::linearEtalonSearch()
         QFileInfo info(files[0]);
         QDir dir = info.dir();
         dir.cdUp();
-        settings.setValue("directory/samples", dir.absolutePath());
+        if (!name.isEmpty()) {
+            settings.beginGroup(name);
+            settings.setValue("directory_samples", dir.absolutePath());
+            settings.endGroup();
+        }
     }
 
     QString text("<h2>Linear Etalon Search</h2>");
@@ -423,8 +446,11 @@ void MainWindow::unmixingSamples()
     Index cols = tableActiveEtalons();
     if (cols == 0) return;
 
+    QString name = Parameters::global.settingsName();
     QSettings settings;
-    QString directorySamples = settings.value("directory/samples").toString();
+    settings.beginGroup(name);
+    QString directorySamples = settings.value("directory_samples").toString();
+    settings.endGroup();
 
     QFileDialog dialog(this, tr("Read Samples"));
     dialog.setDirectory(directorySamples);
@@ -439,7 +465,11 @@ void MainWindow::unmixingSamples()
         QFileInfo info(files[0]);
         QDir dir = info.dir();
         dir.cdUp();
-        settings.setValue("directory/samples", dir.absolutePath());
+        if (!name.isEmpty()) {
+            settings.beginGroup(name);
+            settings.setValue("directory_samples", dir.absolutePath());
+            settings.endGroup();
+        }
     }
 
     QString text("<h2>Unmixing samples</h2>");
@@ -491,5 +521,5 @@ void MainWindow::unmixingSamples()
 
 void MainWindow::removeContinuum(SpectralData &sd)
 {
-    if (parameters.continuumRemoval()) sd.continuumRemoval();
+    if (Parameters::global.continuumRemoval()) sd.continuumRemoval();
 }
