@@ -100,7 +100,7 @@ void ParametersEditor::buildComboBox()
     QStringList names = settings.childGroups();
     using unsignedQString = std::pair<unsigned, QString>;
     std::vector<unsignedQString> pairs;
-    for (name : names)
+    for (auto name : names)
     {
         settings.beginGroup(name);
         unsignedQString p;
