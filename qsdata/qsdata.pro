@@ -16,14 +16,16 @@ SOURCES += main.cpp\
     notes.cpp \
     qsdatasettings.cpp \
     version.cpp \
-    parameterseditor.cpp
+    parameterseditor.cpp \
+    xmltoascii.cpp
 
 HEADERS += mainwindow.h \
     samplestoetalon.h \
     notes.h \
     qsdatasettings.h \
     version.h \
-    parameterseditor.h
+    parameterseditor.h \
+    xmltoascii.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qsdlib/release/ -lqsdlib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../qsdlib/debug/ -lqsdlib

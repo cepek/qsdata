@@ -21,6 +21,7 @@
 
 #include "mainwindow.h"
 #include "samplestoetalon.h"
+#include "xmltoascii.h"
 #include "qsdlib.h"
 #include "parameters.h"
 #include "version.h"
@@ -39,6 +40,8 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+    notes = new Notes(this);
+
     QAction* action {nullptr};
     QMenuBar* menuBar = new QMenuBar(this);
 
@@ -118,7 +121,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     samples->setEtalonsMinX(Parameters::global.etalonsMinX());
     action = menuTools->addAction(tr("&Samples to Etalon"));
     connect(action, &QAction::triggered, [samples](){samples->show();});
-
+    action = menuTools->addAction(tr("XML to &ASCII"));
+    connect(action, &QAction::triggered, [this](){
+        XmlToAscii* xmltoascii = new XmlToAscii(notes);
+        xmltoascii->run();
+        delete xmltoascii;
+        });
 
     auto bothPositive = [](int a, int b) {return a >0 && b>0; };
 
@@ -134,8 +142,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     int py = settings.value("mainWindow_posY").toInt();
     if (bothPositive(px, py)) move(px, py);
     settings.endGroup();
-
-    notes = new Notes(this);
 
     // checkable table of etalons
     table = new QTableWidget;
@@ -224,7 +230,7 @@ void MainWindow::conditionNumberOfEtalonsMatrix()
         }
     }
     text += "</table>";
-    notes->edit->append(text);
+    notes->textEdit()->append(text);
     notes->show();
 }
 
@@ -419,7 +425,7 @@ void MainWindow::linearEtalonSearch()
         text += "</table>";
     }
 
-    notes->edit->append(text);
+    notes->textEdit()->append(text);
     notes->show();
 }
 
@@ -515,7 +521,7 @@ void MainWindow::unmixingSamples()
         text += "</table>";
     }
 
-    notes->edit->append(text);
+    notes->textEdit()->append(text);
     notes->show();
 }
 

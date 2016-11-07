@@ -32,8 +32,9 @@ public:
     explicit Notes(QWidget *parent = 0);
     ~Notes();
 
+    QTextEdit* textEdit() { return edit; }
+
 private:
-    friend class MainWindow;
     QTextEdit* edit {nullptr};
 
 signals:
