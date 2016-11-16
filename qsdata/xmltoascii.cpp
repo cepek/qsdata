@@ -8,12 +8,12 @@
 XmlToAscii::XmlToAscii(Notes* pnotes, QWidget *parent)
     : QWidget(parent), notes(pnotes)
 {
-    qDebug() << "XmlToAscii::XmlToAscii()";
+    // qDebug() << "XmlToAscii::XmlToAscii()";
 }
 
 XmlToAscii::~XmlToAscii()
 {
-    qDebug() << "XmlToAscii::~XmlToAscii()";
+    // qDebug() << "XmlToAscii::~XmlToAscii()";
 }
 
 void XmlToAscii::run()
@@ -22,7 +22,6 @@ void XmlToAscii::run()
         notes->textEdit()->append("<p>XML to ASCII canceled by user</p>");
     };
 
-    qDebug() << "XmlToAscii::run()";
     QFileDialog fdialog;
     fdialog.setWindowTitle(tr("XML to ASCII - input file(s)"));
     fdialog.setFileMode(QFileDialog::ExistingFiles);
@@ -66,12 +65,7 @@ void XmlToAscii::run()
         name = QFileInfo(outputd, name).absoluteFilePath();
         QFile out(name);
         out.open(QFile::WriteOnly);
-        QTextStream stream(&out);
-        stream.setRealNumberPrecision(16);
-        for (int i=0; i<data.x.size(); i++)
-        {
-            stream << data.x[i] << "\t" << data.y[i] << "\n";
-        }
+        data.writeASCII(out);
 
         text += "</td></tr>";
     }

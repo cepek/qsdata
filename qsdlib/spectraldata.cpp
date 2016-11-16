@@ -2,10 +2,12 @@
 
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QFileInfo>
 #include <QMessageBox>
 
 #include <iterator>
 #include <sstream>
+#include <fstream>
 #include <QDebug>
 
 SpectralData::SpectralData()
@@ -13,24 +15,34 @@ SpectralData::SpectralData()
 
 }
 
-void SpectralData::readData(std::istream &istr, std::string *spectrometerHeader)
+void SpectralData::readData(QFile &file)
 {
+    const std::string sep { ">>>>>Begin Spectral Data<<<<<" };
+
+    std::string sname = file.fileName().toStdString();
+    std::ifstream istr(sname);
+
     x.clear();
     y.clear();
-    name.clear();
+    name = QFileInfo(file).baseName();   // .clear();
 
     std::string node((std::istreambuf_iterator<char>(istr)),
                       std::istreambuf_iterator<char>());
-    for (char& c : node) if (c == ',') c = '.';
+
+    if (node.find("<?xml") != std::string::npos) return readXML(file);
+
+    bool spectrometer_format = node.find(sep) != std::string::npos;
+
+    if (spectrometer_format) for (char& c : node) if (c == ',') c = '.';
+
     std::istringstream istream(node);
 
-    if (spectrometerHeader != nullptr) spectrometerHeader->clear();
-    const std::string sep {">>>>>Begin Spectral Data<<<<<"};
-    std::string line;
-    while(std::getline(istream, line)) {
-        if (line.substr(0,sep.length()) == sep) break;
-
-        if (spectrometerHeader != nullptr) *spectrometerHeader += line + "\n";
+    if (spectrometer_format)
+    {
+        std::string line;
+        while(std::getline(istream, line)) {
+            if (line.substr(0,sep.length()) == sep) break;
+        }
     }
 
     double ix, iy;
@@ -144,6 +156,16 @@ void SpectralData::writeXML(QFile &file)
 
     xml.writeEndElement();
     xml.writeEndDocument();
+}
+
+void SpectralData::writeASCII(QFile &file)
+{
+    QTextStream stream(&file);
+    stream.setRealNumberPrecision(real_number_precision);
+    for (int i=0; i<x.size(); i++)
+    {
+        stream << x[i] << "\t" << y[i] << "\n";
+    }
 }
 
 void SpectralData::continuumRemoval()

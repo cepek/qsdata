@@ -27,6 +27,7 @@
 #include "version.h"
 
 #include <limits>
+#include <memory>
 #include <fstream>
 #include <QMenuBar>
 #include <QSettings>
@@ -123,9 +124,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(action, &QAction::triggered, [samples](){samples->show();});
     action = menuTools->addAction(tr("XML to &ASCII"));
     connect(action, &QAction::triggered, [this](){
-        XmlToAscii* xmltoascii = new XmlToAscii(notes);
+        std::unique_ptr<XmlToAscii> xmltoascii { new XmlToAscii(notes) };
         xmltoascii->run();
-        delete xmltoascii;
         });
 
     auto bothPositive = [](int a, int b) {return a >0 && b>0; };
@@ -249,7 +249,7 @@ void MainWindow::readEtalons(const QStringList &files)
         QFile file(name);
         file.open(QFile::ReadOnly);
         SpectralData* sd = new SpectralData;
-        sd->readXML(file);
+        sd->readData(file);//readXML
         removeContinuum(*sd);
         etalons.push_back(sd);
 
@@ -308,6 +308,7 @@ void MainWindow::readSelectedEtalons()
     QFileDialog dialog(this, tr("Read Etalons"));
     dialog.setDirectory(directoryEtalons);
     dialog.setFileMode(QFileDialog::ExistingFiles);
+    dialog.setNameFilters(input_name_filters);
 
     if (!dialog.exec()) return;
     QStringList files = dialog.selectedFiles();
@@ -380,9 +381,11 @@ void MainWindow::linearEtalonSearch()
 
     for (QString f : files) {
         text += "<p>" + QFileInfo(f).fileName() + "</p>";
-        std::fstream stream(f.toStdString());
+
+        QFile file(f);
+        file.open(QIODevice::ReadOnly|QIODevice::Text);
         SpectralData sample;
-        sample.readData(stream);
+        sample.readData(file);
         removeContinuum(sample);
 
         using tuple = std::tuple<double,double,QString>;
@@ -483,9 +486,11 @@ void MainWindow::unmixingSamples()
     for (QString f : files) {
         QFileInfo info(f);
         text += "<p>" + info.fileName() + "</p>";
-        std::fstream stream(f.toStdString());
+
+        QFile file(f);
+        file.open(QIODevice::ReadOnly|QIODevice::Text);
         SpectralData sample;
-        sample.readData(stream);
+        sample.readData(file);
         removeContinuum(sample);
 
         Index rows = sample.y.size()-etalonsMinIndex;

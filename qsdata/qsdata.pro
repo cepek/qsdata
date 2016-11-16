@@ -42,3 +42,5 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../qsdlib/libqsdlib.a
 
 RESOURCES += \
     qsdata.qrc
+
+DISTFILES +=

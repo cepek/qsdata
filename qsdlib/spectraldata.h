@@ -35,13 +35,21 @@ public:
     QString         name;
 
     SpectralData();
-    void readData(std::istream& istr, std::string* spectrometerHeader=nullptr);
+    void readData(QFile& file);
     void getLimits(double& minx, double& maxx, double& miny, double& maxy, bool init=false);
 
     void readXML (QFile& file);
     void writeXML(QFile& file);
+    void writeASCII(QFile& file);
 
     void continuumRemoval();
+
+    int  realNumberPrecision() const { return real_number_precision; }
+    void setRealNumberPrecision(int p) { real_number_precision = p; }
+
+private:
+
+    int real_number_precision {16};
 };
 
 #endif // SPECTRAL_DATA_H

@@ -116,9 +116,11 @@ void SamplesToEtalon::read()
     etalon.clear();
     for (auto name : files)
     {
-        std::ifstream file(name.toStdString());
+        //std::ifstream file(name.toStdString());
 
         SpectralData * sp = new SpectralData;
+        QFile file(name);
+        file.open(QIODevice::ReadOnly|QIODevice::Text);
         sp->readData(file);
         etalon.push_back(sp);
 

@@ -48,6 +48,12 @@ public:
     ~MainWindow();
 
 private:
+    const QStringList input_name_filters {
+        tr("Text files (*.xml *.txt)"),
+        tr("XML files (*.xml)"),
+        tr("ASCII files (*.txt)"),
+        tr("Any files (*)")
+    };
     QTableWidget* table;
     bool tableHasChanged   {false};
     QVector<SpectralData*> etalons;    
