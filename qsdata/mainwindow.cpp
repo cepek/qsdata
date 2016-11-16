@@ -249,7 +249,7 @@ void MainWindow::readEtalons(const QStringList &files)
         QFile file(name);
         file.open(QFile::ReadOnly);
         SpectralData* sd = new SpectralData;
-        sd->readData(file);//readXML
+        sd->readData(file);
         removeContinuum(*sd);
         etalons.push_back(sd);
 
