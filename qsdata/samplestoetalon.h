@@ -23,6 +23,7 @@
 #define SAMPLESTOETALON_H
 
 #include <QMainWindow>
+#include <QTableWidget>
 #include "qsdlib.h"
 
 class SamplesToEtalon : public QMainWindow
@@ -38,6 +39,7 @@ private:
     void read();
     void save();
 
+    QTableWidget* table;
     QCustomPlot* customPlot;
     SpectralSampleEtalon etalon;
     QString basicWindowTitle;

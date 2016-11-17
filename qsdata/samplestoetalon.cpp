@@ -24,6 +24,7 @@
 #include <fstream>
 #include <QMenuBar>
 #include <QSettings>
+#include <QSplitter>
 #include <QDebug>
 
 SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
@@ -33,8 +34,18 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
     customPlot = new QCustomPlot(this);
     //customPlot->hide();
 
+    table = new QTableWidget;
+    table->setColumnCount(2);
+    table->hideColumn(1);
+    table->setHorizontalHeaderLabels(QStringList() << tr("Samples"));
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->verticalHeader()->setVisible(false);
+
+    QSplitter* splitter = new QSplitter;
+    splitter->addWidget(table);
+    splitter->addWidget(customPlot);
     QGridLayout* grid = new QGridLayout;
-    grid->addWidget(customPlot);
+    grid->addWidget(splitter);
     QWidget* window = new QWidget;
     window->setLayout(grid);
     setCentralWidget(window);
@@ -55,6 +66,13 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
     action = menuFile->addAction(tr("&Close"));
     connect(action,SIGNAL(triggered(bool)), SLOT(close()));
 
+    QMenu* menuEdit = menuBar->addMenu(tr("&Edit"));
+    action = menuEdit->addAction(tr("Select &All"));
+    connect(action, &QAction::triggered, [this](){;});
+
+    action = menuEdit->addAction(tr("Select &None"));
+    connect(action, &QAction::triggered, [this](){;});
+
     setMenuBar(menuBar);
 
 
@@ -64,8 +82,11 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
 
     int w = settings.value("sampleToEtalon/sizeWidth" ).toInt();
     int h = settings.value("sampleToEtalon/sizeHeight").toInt();
-    if (bothPositive(w, h)) resize(w, h);
-    else                    resize(600,400);
+    if (!bothPositive(w, h)) w=600, h=400;
+    resize(w, h);
+
+    QList<int> sizes {int(0.2*w),int(0.8*w)};
+    splitter->setSizes(sizes);
 
     int px = settings.value("sampleToEtalon/posX").toInt();
     int py = settings.value("sampleToEtalon/posY").toInt();
@@ -114,6 +135,9 @@ void SamplesToEtalon::read()
     double yMax {std::numeric_limits<double>::min()};
 
     etalon.clear();
+    table->clearContents();
+    table->setRowCount(files.size());
+    int row {0};
     for (auto name : files)
     {
         //std::ifstream file(name.toStdString());
@@ -125,6 +149,12 @@ void SamplesToEtalon::read()
         etalon.push_back(sp);
 
         sp->getLimits(xMin, xMax, yMin, yMax);
+
+        QTableWidgetItem* item = new QTableWidgetItem(sp->name);
+        item->setCheckState(Qt::Checked);
+        table->setItem(row, 0, item);
+        table->setItem(row, 1, new QTableWidgetItem(QString::number(row)));
+        row++;
     }
 
     customPlot->clearGraphs();

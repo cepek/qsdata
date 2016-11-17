@@ -1,7 +1,11 @@
+0.9.5
+
+* added checkbox file list to SamplesToEtalon 
+
 0.9.4
 
 * class SpectralData : added functions writeASCII,
-     setRealNumberPrecusion(int) and realNumberPrecision()
+  setRealNumberPrecusion(int) and realNumberPrecision()
 
 * SpetralData::readData(QFile& file) : newly reads ascii output from
   spectrometer, XML data and ASCII texts (x, y)
