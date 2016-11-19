@@ -149,7 +149,7 @@ void SamplesToEtalon::read()
         QFile file(name);
         file.open(QIODevice::ReadOnly|QIODevice::Text);
         sp->readData(file);
-        etalon.push_back(sp);
+        etalon.push_back(std::shared_ptr<SpectralData>(sp));
 
         sp->getLimits(xMin, xMax, yMin, yMax);
 
@@ -167,8 +167,7 @@ void SamplesToEtalon::read()
 
 void SamplesToEtalon::setCustomPlot()
 {
-    qDebug() << "void SamplesToEtalon::setCustomPlot() --- dummy version";
-    return;
+    qDebug() << "void SamplesToEtalon::setCustomPlot()";
     table->blockSignals(true);
 
     selected.clear();

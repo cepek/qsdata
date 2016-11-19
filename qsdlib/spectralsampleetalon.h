@@ -29,18 +29,18 @@
 class SpectralSampleEtalon
 {
 public:
-    SpectralSampleEtalon(std::vector<SpectralData*> samples
-                        =std::vector<SpectralData*>());
+    SpectralSampleEtalon(std::vector<std::shared_ptr<SpectralData>> samples
+                        =std::vector<std::shared_ptr<SpectralData>>());
 
-    void push_back(SpectralData* sd);
-    std::vector<SpectralData*> samples() const;
+    void push_back(std::shared_ptr<SpectralData> sd);
+    std::vector<std::shared_ptr<SpectralData>> samples() const;
 
     SpectralData average();
     SpectralData median();
 
     void clear();
 private:
-    std::vector<SpectralData*> samples_;
+    std::vector<std::shared_ptr<SpectralData>> samples_;
 };
 
 #endif // SPECTRALSAMPLEETALON_H

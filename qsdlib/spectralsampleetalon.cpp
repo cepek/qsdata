@@ -1,19 +1,19 @@
 #include "spectralsampleetalon.h"
 
-SpectralSampleEtalon::SpectralSampleEtalon(std::vector<SpectralData*> samples)
+SpectralSampleEtalon::SpectralSampleEtalon(std::vector<std::shared_ptr<SpectralData>> samples)
     : samples_(samples)
 {
 
 }
 
-std::vector<SpectralData*> SpectralSampleEtalon::samples() const
+std::vector<std::shared_ptr<SpectralData>> SpectralSampleEtalon::samples() const
 {
     return samples_;
 }
 
-void SpectralSampleEtalon::push_back(SpectralData *sd)
+void SpectralSampleEtalon::push_back(std::shared_ptr<SpectralData> sd)
 {
-    samples_.push_back(sd);
+    samples_.push_back(std::shared_ptr<SpectralData>(sd));
 }
 
 SpectralData SpectralSampleEtalon::average()
@@ -78,7 +78,6 @@ SpectralData SpectralSampleEtalon::median()
 
 void SpectralSampleEtalon::clear()
 {
-    for (auto data : samples_) delete data;
     samples_.clear();
 }
 
