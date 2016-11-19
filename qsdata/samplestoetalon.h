@@ -30,6 +30,10 @@ class SamplesToEtalon : public QMainWindow
 {
     Q_OBJECT
 public:
+
+    enum class Algorithm { Average, Median };
+    enum class Format    { Etalon,  Sample };
+
     explicit SamplesToEtalon(QWidget *parent = 0);
     ~SamplesToEtalon();
 
@@ -37,7 +41,7 @@ public:
 
 private:
     void read();
-    void save();
+    void save(Algorithm alg, Format fmt);
 
     QTableWidget* table;
     QCustomPlot* customPlot;

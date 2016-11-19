@@ -147,8 +147,8 @@ void SpectralData::writeXML(QFile &file)
     for (int i=0; i<x.size(); i++)
     {
          xml.writeStartElement("point");
-         xml.writeTextElement("x", QString("%1").arg(x[i]));
-         xml.writeTextElement("y", QString("%1").arg(y[i]));
+         xml.writeTextElement("x", QString("%1").arg(x[i],0,'G',16));
+         xml.writeTextElement("y", QString("%1").arg(y[i],0,'G',16));
          xml.writeEndElement();
     }
 

@@ -1,6 +1,8 @@
 0.9.5
 
-* added checkbox file list to SamplesToEtalon 
+* added checkbox file list to SamplesToEtalon
+
+* added output in xml/txt in SamplesToEtalon
 
 0.9.4
 

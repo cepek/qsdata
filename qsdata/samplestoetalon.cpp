@@ -29,7 +29,7 @@
 
 SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
 {
-    basicWindowTitle = tr("Samples ⟶ Etalon");
+    basicWindowTitle = tr("Samples ⟶ Etalon / Sample");
     setWindowTitle(basicWindowTitle);
     customPlot = new QCustomPlot(this);
     //customPlot->hide();
@@ -59,8 +59,17 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
     action = menuFile->addAction(tr("&Read"));
     connect(action, &QAction::triggered, [this](){read();});
 
-    action = menuFile->addAction(tr("&Save"));
-    connect(action, &QAction::triggered, [this](){save();});
+    QMenu* saveAverage = menuFile->addMenu(tr("Save &Average"));
+    action = saveAverage->addAction(tr("as &Etalon (xml)"));
+    connect(action, &QAction::triggered, [this](){save(Algorithm::Average, Format::Etalon);});
+    action = saveAverage->addAction(tr("as &Sample (txt)"));
+    connect(action, &QAction::triggered, [this](){save(Algorithm::Average, Format::Sample);});
+
+    QMenu* saveMedian = menuFile->addMenu(tr("Save &Median"));
+    action = saveMedian->addAction(tr("as &Etalon (xml)"));
+    connect(action, &QAction::triggered, [this](){save(Algorithm::Median, Format::Etalon);});
+    action = saveMedian->addAction(tr("as &Sample (txt)"));
+    connect(action, &QAction::triggered, [this](){save(Algorithm::Median, Format::Sample);});
 
     menuFile->addSeparator();
     action = menuFile->addAction(tr("&Close"));
@@ -68,10 +77,20 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
 
     QMenu* menuEdit = menuBar->addMenu(tr("&Edit"));
     action = menuEdit->addAction(tr("Select &All"));
-    connect(action, &QAction::triggered, [this](){;});
+    connect(action, &QAction::triggered, [this](){
+        table->blockSignals(true);
+        for (int row=0; row<table->rowCount(); row++) table->item(row, 0)->setCheckState(Qt::Checked);
+        table->blockSignals(false);
+        if (table->rowCount() > 0)emit table->itemChanged(table->item(0,0));
+    });
 
     action = menuEdit->addAction(tr("Select &None"));
-    connect(action, &QAction::triggered, [this](){;});
+    connect(action, &QAction::triggered, [this](){
+        table->blockSignals(true);
+        for (int row=0; row<table->rowCount(); row++) table->item(row, 0)->setCheckState(Qt::Unchecked);
+        table->blockSignals(false);
+        if (table->rowCount() > 0)emit table->itemChanged(table->item(0,0));
+    });
 
     setMenuBar(menuBar);
 
@@ -222,17 +241,25 @@ void SamplesToEtalon::setCustomPlot()
     table->blockSignals(false);
 }
 
-void SamplesToEtalon::save()
+void SamplesToEtalon::save(Algorithm alg, Format fmt)
 {
     qDebug() << "SamplesToEtalon::save()";
     QSettings settings;
     QString directoryEtalons = settings.value("directory/etalons").toString();
 
-    QFileDialog dialog(this, tr("Save Etalon"), directoryEtalons, "*.xml");
+    QString extension = (fmt == Format::Etalon) ? "*.xml" : "*.txt";
+    QString title;
+    if (alg == Algorithm::Average) title =  tr("Save Average as ");
+    else                           title =  tr("Save Median as ");
+    if (fmt == Format::Etalon)     title += tr("XML");
+    else                           title += tr("Text");
+
+    QFileDialog dialog(this, title, directoryEtalons, extension);
     dialog.setDirectory(directoryEtalons);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix("xml");
+    if (fmt == Format::Etalon) dialog.setDefaultSuffix("xml");
+    else                       dialog.setDefaultSuffix("txt");
 
     if (!dialog.exec()) return;
 
@@ -245,15 +272,21 @@ void SamplesToEtalon::save()
     QString name = slist[0];
     QFileInfo info(name);
     QString baseName = info.baseName();
-    //QString suffix = info.suffix();
-    //if (suffix.isEmpty()) name += ".xml";
 
     QFile file(name);
     file.open(QIODevice::WriteOnly|QIODevice::Text);
 
     setWindowTitle(basicWindowTitle + " : " + baseName);
 
-    SpectralData sd = selected.average();
-    sd.name = baseName;
-    sd.writeXML(file);
+    if (alg == Algorithm::Average) {
+        SpectralData sd = selected.average();
+        sd.name = baseName;
+        if (fmt == Format::Etalon) sd.writeXML(file);
+        else                       sd.writeASCII(file);
+    } else {
+        SpectralData sd = selected.median();
+        sd.name = baseName;
+        if (fmt == Format::Etalon) sd.writeXML(file);
+        else                       sd.writeASCII(file);
+    }
 }
