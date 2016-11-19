@@ -41,12 +41,18 @@ private:
 
     QTableWidget* table;
     QCustomPlot* customPlot;
-    SpectralSampleEtalon etalon;
+    SpectralSampleEtalon etalon, selected;
     QString basicWindowTitle;
     double etalonsMinX {0};
 
+    double xMin {std::numeric_limits<double>::max()};
+    double xMax {std::numeric_limits<double>::min()};
+    double yMin {std::numeric_limits<double>::max()};
+    double yMax {std::numeric_limits<double>::min()};
+
 signals:
 public slots:
+    void setCustomPlot();
 };
 
 #endif // SAMPLESTOETALON_H

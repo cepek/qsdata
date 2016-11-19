@@ -255,6 +255,7 @@ void MainWindow::readEtalons(const QStringList &files)
 
         QTableWidgetItem* item = new QTableWidgetItem(sd->name);
         item->setCheckState(Qt::Checked);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
         table->setItem(row, 0, item);
         table->setItem(row, 1, new QTableWidgetItem(QString::number(row)));
         row++;

@@ -24,6 +24,7 @@
 
 #include "spectraldata.h"
 #include <vector>
+#include <memory>
 
 class SpectralSampleEtalon
 {

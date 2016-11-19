@@ -91,6 +91,8 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
     int px = settings.value("sampleToEtalon/posX").toInt();
     int py = settings.value("sampleToEtalon/posY").toInt();
     if (bothPositive(px, py)) move(px, py);
+
+    connect(table, &QTableWidget::itemChanged, this, &SamplesToEtalon::setCustomPlot);
 }
 
 SamplesToEtalon::~SamplesToEtalon()
@@ -129,11 +131,12 @@ void SamplesToEtalon::read()
         settings.setValue("directory_samples", dir.absolutePath());
     }
 
-    double xMin {std::numeric_limits<double>::max()};
-    double xMax {std::numeric_limits<double>::min()};
-    double yMin {std::numeric_limits<double>::max()};
-    double yMax {std::numeric_limits<double>::min()};
+    xMin = std::numeric_limits<double>::max();
+    xMax = std::numeric_limits<double>::min();
+    yMin = std::numeric_limits<double>::max();
+    yMax = std::numeric_limits<double>::min();
 
+    table->blockSignals(true);
     etalon.clear();
     table->clearContents();
     table->setRowCount(files.size());
@@ -152,15 +155,38 @@ void SamplesToEtalon::read()
 
         QTableWidgetItem* item = new QTableWidgetItem(sp->name);
         item->setCheckState(Qt::Checked);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
         table->setItem(row, 0, item);
         table->setItem(row, 1, new QTableWidgetItem(QString::number(row)));
         row++;
     }
+    table->blockSignals(false);
 
+    setCustomPlot();
+}
+
+void SamplesToEtalon::setCustomPlot()
+{
+    qDebug() << "void SamplesToEtalon::setCustomPlot() --- dummy version";
+    return;
+    table->blockSignals(true);
+
+    selected.clear();
     customPlot->clearGraphs();
+    customPlot->xAxis->setLabel("wavelength");
+    customPlot->yAxis->setLabel("intensity");
+    customPlot->xAxis->setRange(xMin, xMax);
+    customPlot->yAxis->setRange(yMin, yMax);
+
+    int row {0};
     unsigned igraph {0};
     for (auto sp : etalon.samples())
     {
+        qDebug() << row << table->item(row,0)->checkState();
+        if (table->item(row++,0)->checkState() == Qt::CheckState::Unchecked) continue;
+
+        selected.push_back(sp);
+
         /* http://www.qcustomplot.com
          * --------------------------
          */
@@ -168,23 +194,14 @@ void SamplesToEtalon::read()
         customPlot->graph(igraph)->setPen(QPen(Qt::lightGray));
         customPlot->graph(igraph)->setData(sp->x, sp->y);
         igraph++;
-
-        if (igraph == 1)
-        {
-            customPlot->xAxis->setLabel("wavelength");
-            customPlot->yAxis->setLabel("intensity");
-
-            customPlot->xAxis->setRange(xMin, xMax);
-            customPlot->yAxis->setRange(yMin, yMax);
-        }
     }
 
-    SpectralData a = etalon.average();
+    SpectralData a = selected.average();
     customPlot->addGraph();
     customPlot->graph(igraph)->setPen(QPen(Qt::darkBlue));
     customPlot->graph(igraph++)->setData(a.x, a.y);
 
-    SpectralData b = etalon.median();
+    SpectralData b = selected.median();
     customPlot->addGraph();
     customPlot->graph(igraph)->setPen(QPen(Qt::green));
     customPlot->graph(igraph++)->setData(b.x, b.y);
@@ -201,8 +218,9 @@ void SamplesToEtalon::read()
     }
 
     customPlot->replot();
-
     customPlot->show();
+
+    table->blockSignals(false);
 }
 
 void SamplesToEtalon::save()
@@ -236,7 +254,7 @@ void SamplesToEtalon::save()
 
     setWindowTitle(basicWindowTitle + " : " + baseName);
 
-    SpectralData sd = etalon.average();
+    SpectralData sd = selected.average();
     sd.name = baseName;
     sd.writeXML(file);
 }
