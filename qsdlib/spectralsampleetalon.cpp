@@ -22,13 +22,13 @@ SpectralData SpectralSampleEtalon::average()
     if (samples_.size() == 0) return average_;
 
     const size_t M = samples_.size();
-    const size_t N = samples_[0]->x.size();
-    average_.x.resize(N);
-    average_.y.resize(N);
+    const size_t N = samples_[0]->sdx.size();
+    average_.sdx.resize(N);
+    average_.sdy.resize(N);
     for (size_t i=0; i<N; i++)
     {
-        average_.x[i] = samples_[0]->x[i];
-        average_.y[i] = 0;
+        average_.sdx[i] = samples_[0]->sdx[i];
+        average_.sdy[i] = 0;
     }
 
     for (size_t i=0; i<N; i++)
@@ -36,9 +36,9 @@ SpectralData SpectralSampleEtalon::average()
         double s = 0;
         for (size_t j=0; j<M; j++)
         {
-            s += samples_[j]->y[i];
+            s += samples_[j]->sdy[i];
         }
-        average_.y[i] = s/M;
+        average_.sdy[i] = s/M;
     }
 
     return average_;
@@ -50,15 +50,15 @@ SpectralData SpectralSampleEtalon::median()
     if (samples_.size() == 0) return median_;
 
     const size_t M = samples_.size();
-    const size_t N = samples_[0]->x.size();
+    const size_t N = samples_[0]->sdx.size();
     const size_t L = (M-1)/2;
     const size_t U =  M/2;
-    median_ .x.resize(N);
-    median_ .y.resize(N);
+    median_ .sdx.resize(N);
+    median_ .sdy.resize(N);
     for (size_t i=0; i<N; i++)
     {
-        median_ .x[i] = samples_[0]->x[i];
-        median_ .y[i] = 0;
+        median_ .sdx[i] = samples_[0]->sdx[i];
+        median_ .sdy[i] = 0;
     }
 
     for (size_t i=0; i<N; i++)
@@ -66,11 +66,11 @@ SpectralData SpectralSampleEtalon::median()
         QVector<double> t;
         for (size_t j=0; j<M; j++)
         {
-            t.push_back(samples_[j]->y[i]);
+            t.push_back(samples_[j]->sdy[i]);
         }
 
         std::sort(t.begin(), t.end());
-        median_ .y[i] = (t[L] + t[U])/2;
+        median_ .sdy[i] = (t[L] + t[U])/2;
     }
 
     return median_;

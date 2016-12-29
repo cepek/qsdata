@@ -31,7 +31,7 @@
 class SpectralData
 {
 public:
-    QVector<double> x, y;
+    QVector<double> sdx, sdy;
     QString         name;
 
     SpectralData();

@@ -210,19 +210,19 @@ void SamplesToEtalon::setCustomPlot()
          */
         customPlot->addGraph();
         customPlot->graph(igraph)->setPen(QPen(Qt::lightGray));
-        customPlot->graph(igraph)->setData(sp->x, sp->y);
+        customPlot->graph(igraph)->setData(sp->sdx, sp->sdy);
         igraph++;
     }
 
     SpectralData a = selected.average();
     customPlot->addGraph();
     customPlot->graph(igraph)->setPen(QPen(Qt::darkBlue));
-    customPlot->graph(igraph++)->setData(a.x, a.y);
+    customPlot->graph(igraph++)->setData(a.sdx, a.sdy);
 
     SpectralData b = selected.median();
     customPlot->addGraph();
     customPlot->graph(igraph)->setPen(QPen(Qt::green));
-    customPlot->graph(igraph++)->setData(b.x, b.y);
+    customPlot->graph(igraph++)->setData(b.sdx, b.sdy);
 
     if (etalonsMinX > 0)
     {

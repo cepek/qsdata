@@ -196,7 +196,7 @@ void MainWindow::conditionNumberOfEtalonsMatrix()
 {
     Index cols = tableActiveEtalons();
     if (cols == 0) return;
-    Index rows = etalons[0]->x.size() - etalonsMinIndex;
+    Index rows = etalons[0]->sdx.size() - etalonsMinIndex;
 
     Mat A(rows, cols);
     activeEtalonsToSubMatrix(A);
@@ -271,7 +271,7 @@ void MainWindow::readEtalons(const QStringList &files)
 
     etalonsMinIndex = 0;
     if (etalons.size() > 0) {
-        const QVector<double>& x = etalons[0]->x;
+        const QVector<double>& x = etalons[0]->sdx;
         for (etalonsMinIndex=0; etalonsMinIndex<x.size(); etalonsMinIndex++)
             if (x[etalonsMinIndex] >= Parameters::global.etalonsMinX()) break;
     }
@@ -339,9 +339,9 @@ void MainWindow::activeEtalonsToSubMatrix(Mat &A)
 
         int eind = tableToEtalonIndex(c);
         activeEtalonsIndexes.push_back(eind);
-        for (Index rindex=1, r=etalonsMinIndex; r<Index(etalons[eind]->y.size()); r++)
+        for (Index rindex=1, r=etalonsMinIndex; r<Index(etalons[eind]->sdy.size()); r++)
         {
-            double a = etalons[eind]->y[r];
+            double a = etalons[eind]->sdy[r];
             A(rindex++,cindex) = a;
         }
         cindex++;
@@ -402,10 +402,10 @@ void MainWindow::linearEtalonSearch()
             double ed {0};
             int etalon_index = tableToEtalonIndex(c);
             SpectralData* etalon = etalons[etalon_index];
-            for (int r=etalonsMinIndex; r<etalon->y.size(); r++)
+            for (int r=etalonsMinIndex; r<etalon->sdy.size(); r++)
             {
-                double a = etalon->y[r];
-                double b = sample.y[r];
+                double a = etalon->sdy[r];
+                double b = sample.sdy[r];
                 dp += a*b;
                 sa += a*a;
                 sb += b*b;
@@ -494,10 +494,10 @@ void MainWindow::unmixingSamples()
         sample.readData(file);
         removeContinuum(sample);
 
-        Index rows = sample.y.size()-etalonsMinIndex;
+        Index rows = sample.sdy.size()-etalonsMinIndex;
         Vec b(rows);
-        for (Index i=1, r=etalonsMinIndex; r<Index(sample.y.size()); i++, r++) {
-            b(i) = sample.y[r];
+        for (Index i=1, r=etalonsMinIndex; r<Index(sample.sdy.size()); i++, r++) {
+            b(i) = sample.sdy[r];
         }
         //std::cerr << trans(b);
 

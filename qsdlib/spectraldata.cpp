@@ -22,8 +22,8 @@ void SpectralData::readData(QFile &file)
     std::string sname = file.fileName().toStdString();
     std::ifstream istr(sname);
 
-    x.clear();
-    y.clear();
+    sdx.clear();
+    sdy.clear();
     name = QFileInfo(file).baseName();   // .clear();
 
     std::string node((std::istreambuf_iterator<char>(istr)),
@@ -47,8 +47,8 @@ void SpectralData::readData(QFile &file)
 
     double ix, iy;
     while(istream >> ix >> iy) {
-        x.push_back(ix);
-        y.push_back(iy);
+        sdx.push_back(ix);
+        sdy.push_back(iy);
     }
 }
 
@@ -60,11 +60,11 @@ void SpectralData::getLimits(double &xMin, double &xMax, double &yMin, double &y
         xMax = yMax = std::numeric_limits<double>::min();
     }
 
-    for (double t : x) {
+    for (double t : sdx) {
         if (t < xMin) xMin = t;
         if (t > xMax) xMax = t;
     }
-    for (double t : y) {
+    for (double t : sdy) {
         if (t < yMin) yMin = t;
         if (t > yMax) yMax = t;
     }
@@ -72,8 +72,8 @@ void SpectralData::getLimits(double &xMin, double &xMax, double &yMin, double &y
 
 void SpectralData::readXML(QFile &file)
 {
-    x.clear();
-    y.clear();
+    sdx.clear();
+    sdy.clear();
     name.clear();
 
     QXmlStreamReader xml(&file);
@@ -111,12 +111,12 @@ void SpectralData::readXML(QFile &file)
 
             xml.readNextStartElement();
             auto tx = xml.readElementText();
-            x.push_back(tx.toDouble());
+            sdx.push_back(tx.toDouble());
             xml.readNext();
 
             xml.readNextStartElement();
             auto ty = xml.readElementText();
-            y.push_back(ty.toDouble());
+            sdy.push_back(ty.toDouble());
             xml.readNext();
 
             // read end element </point>
@@ -144,11 +144,11 @@ void SpectralData::writeXML(QFile &file)
 
     xml.writeStartElement("spectraldata");
 
-    for (int i=0; i<x.size(); i++)
+    for (int i=0; i<sdx.size(); i++)
     {
          xml.writeStartElement("point");
-         xml.writeTextElement("x", QString("%1").arg(x[i],0,'G',16));
-         xml.writeTextElement("y", QString("%1").arg(y[i],0,'G',16));
+         xml.writeTextElement("x", QString("%1").arg(sdx[i],0,'G',16));
+         xml.writeTextElement("y", QString("%1").arg(sdy[i],0,'G',16));
          xml.writeEndElement();
     }
 
@@ -162,39 +162,39 @@ void SpectralData::writeASCII(QFile &file)
 {
     QTextStream stream(&file);
     stream.setRealNumberPrecision(real_number_precision);
-    for (int i=0; i<x.size(); i++)
+    for (int i=0; i<sdx.size(); i++)
     {
-        stream << x[i] << "\t" << y[i] << "\n";
+        stream << sdx[i] << "\t" << sdy[i] << "\n";
     }
 }
 
 void SpectralData::continuumRemoval()
 {
-    const int N = x.size();
+    const int N = sdx.size();
     QVector<double> r(N);
 
     int minIndX {};
-    r = y; // ************
+    r = sdy; // ************
 #if 0
     for (minIndX = 0; minIndX<N; minIndX++) {
         r[minIndX] = y[minIndX];
     }
 #endif
-    double px = x[minIndX];
-    double py = y[minIndX];
+    double px = sdx[minIndX];
+    double py = sdy[minIndX];
     r[minIndX] = py;
 
     for (int i=minIndX+1; i<N-1; i++)
     {
         bool test = true;
-        double dx1 = x[i] - px;
-        double dy1 = y[i] - py;
+        double dx1 = sdx[i] - px;
+        double dy1 = sdy[i] - py;
         double a1  = std::atan2(dy1,dx1);
 
         for (int j=i+1; j<N; j++)
         {
-            double dx2 = x[j] - px;
-            double dy2 = y[j] - py;
+            double dx2 = sdx[j] - px;
+            double dy2 = sdy[j] - py;
             double a2  = std::atan2(dy2,dx2);
 
             if (a1 < a2)
@@ -205,15 +205,15 @@ void SpectralData::continuumRemoval()
         }
         if (test)
         {
-            px = x[i];
-            py = y[i];
+            px = sdx[i];
+            py = sdy[i];
             int j = minIndX+1;
-            double dx = x[i] - x[minIndX];
-            double x0 = x[minIndX];
-            double y0 = y[minIndX];
-            double dy = (y[i] - r[minIndX])/dx;
+            double dx = sdx[i] - sdx[minIndX];
+            double x0 = sdx[minIndX];
+            double y0 = sdy[minIndX];
+            double dy = (sdy[i] - r[minIndX])/dx;
             while (j <= i) {
-                r[minIndX+1] = (y0 + dy*(x[j]-x0));
+                r[minIndX+1] = (y0 + dy*(sdx[j]-x0));
                 minIndX++;
                 j++;
             }
@@ -221,17 +221,17 @@ void SpectralData::continuumRemoval()
     }
     int i = N - 1;
     int j = minIndX+1;
-    double dx = x[i] - x[minIndX];
-    double x0 = x[minIndX];
+    double dx = sdx[i] - sdx[minIndX];
+    double x0 = sdx[minIndX];
     double y0 = r[minIndX];
-    double dy = (y[i] - r[minIndX])/dx;
+    double dy = (sdy[i] - r[minIndX])/dx;
     while (j <= i) {
-        r[minIndX+1] = (y0 + dy*(x[j]-x0));
+        r[minIndX+1] = (y0 + dy*(sdx[j]-x0));
         minIndX++;
         j++;
     }
     for (int i=0; i<r.size(); i++)
     {
-        y[i] = y[i]/r[i];
+        sdy[i] = sdy[i]/r[i];
     }
 }
