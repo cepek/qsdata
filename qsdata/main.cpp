@@ -23,6 +23,7 @@
 #include "parameters.h"
 #include "parameterseditor.h"
 #include "qsdatasettings.h"
+#include "spectraldata.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QDebug>
@@ -49,6 +50,8 @@ int main(int argc, char *argv[])
 
     if (accepted)
     {
+        SpectralData::addSdxVector();
+
         MainWindow w;
         w.show();
         return a.exec();

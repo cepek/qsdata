@@ -31,10 +31,12 @@
 class SpectralData
 {
 public:
-    QVector<double> sdx, sdy;
-    QString         name;
+    QVector<double>& sdx;
+    QVector<double>  sdy;
+    QString          name;
+    const unsigned   sdxIndex;
 
-    SpectralData();
+    SpectralData(unsigned index=0);
     void readData(QFile& file);
     void getLimits(double& minx, double& maxx, double& miny, double& maxy, bool init=false);
 
@@ -47,9 +49,13 @@ public:
     int  realNumberPrecision() const { return real_number_precision; }
     void setRealNumberPrecision(int p) { real_number_precision = p; }
 
+    static void addSdxVector();
+
 private:
 
     int real_number_precision {16};
+
+    static std::vector<QVector<double>> sdxList;
 };
 
 #endif // SPECTRAL_DATA_H

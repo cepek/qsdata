@@ -10,7 +10,16 @@
 #include <fstream>
 #include <QDebug>
 
-SpectralData::SpectralData()
+std::vector<QVector<double>>  SpectralData::sdxList;
+
+void SpectralData::addSdxVector()
+{
+    sdxList.push_back(QVector<double>());
+}
+
+// ------------------------------------------------------------
+
+SpectralData::SpectralData(unsigned index) : sdx(sdxList[index]), sdxIndex(index)
 {
 
 }
@@ -22,7 +31,8 @@ void SpectralData::readData(QFile &file)
     std::string sname = file.fileName().toStdString();
     std::ifstream istr(sname);
 
-    sdx.clear();
+    bool readSdx {sdxList[sdxIndex].size() == 0};
+    // if (readSdx) sdx.clear();
     sdy.clear();
     name = QFileInfo(file).baseName();   // .clear();
 
@@ -47,7 +57,7 @@ void SpectralData::readData(QFile &file)
 
     double ix, iy;
     while(istream >> ix >> iy) {
-        sdx.push_back(ix);
+        if (readSdx) sdx.push_back(ix);
         sdy.push_back(iy);
     }
 }
@@ -72,7 +82,8 @@ void SpectralData::getLimits(double &xMin, double &xMax, double &yMin, double &y
 
 void SpectralData::readXML(QFile &file)
 {
-    sdx.clear();
+    bool readSdx {sdxList[sdxIndex].size() == 0};
+    // if (readSdx) sdx.clear();
     sdy.clear();
     name.clear();
 
@@ -111,7 +122,7 @@ void SpectralData::readXML(QFile &file)
 
             xml.readNextStartElement();
             auto tx = xml.readElementText();
-            sdx.push_back(tx.toDouble());
+            if (readSdx) sdx.push_back(tx.toDouble());
             xml.readNext();
 
             xml.readNextStartElement();
