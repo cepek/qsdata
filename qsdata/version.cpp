@@ -2,7 +2,7 @@
 
 const unsigned Version::major_    {0};
 const unsigned Version::minor_    {9};
-const unsigned Version::revision_ {6};
+const unsigned Version::revision_ {7};
 
 Version::Version()
 {

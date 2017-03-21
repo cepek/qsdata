@@ -13,14 +13,12 @@ TEMPLATE = lib
 CONFIG += staticlib
 
 SOURCES += qsdlib.cpp \
-    qcustomplot.cpp \
     spectraldata.cpp \
     spectralsampleetalon.cpp \
     nonnegativeleastsquares.cpp \
     parameters.cpp
 
 HEADERS += qsdlib.h \
-    qcustomplot.h \
     spectraldata.h \
     spectralsampleetalon.h \
     nonnegativeleastsquares.h \

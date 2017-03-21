@@ -5,7 +5,7 @@
 #-------------------------------------------------
 include(../qsdata.pri)
 
-QT       += core gui widgets printsupport
+QT       += core gui widgets printsupport charts
 
 TARGET = qsdata
 TEMPLATE = app

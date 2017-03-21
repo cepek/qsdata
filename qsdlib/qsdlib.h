@@ -24,7 +24,6 @@
 
 #include "spectraldata.h"
 #include "spectralsampleetalon.h"
-#include "qcustomplot.h"
 #include "nonnegativeleastsquares.h"
 #include "parameters.h"
 

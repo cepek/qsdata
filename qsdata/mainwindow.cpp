@@ -37,6 +37,11 @@
 #include <QTableWidgetItem>
 #include <QSettings>
 #include <QDateTime>
+#include <QMessageBox>
+#include <QGridLayout>
+#include <QDirIterator>
+#include <QFileDialog>
+#include <QDir>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)

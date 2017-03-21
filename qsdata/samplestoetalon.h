@@ -24,7 +24,10 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
-#include "qsdlib.h"
+//*** #include "qsdlib.h"
+
+#include <QtCharts/QChartView>
+#include "spectralsampleetalon.h"
 
 class SamplesToEtalon : public QMainWindow
 {
@@ -44,7 +47,7 @@ private:
     void save(Algorithm alg, Format fmt);
 
     QTableWidget* table;
-    QCustomPlot* customPlot;
+    QtCharts::QChartView* customPlot {nullptr};
     SpectralSampleEtalon etalon, selected;
     QString basicWindowTitle;
     double etalonsMinX {0};

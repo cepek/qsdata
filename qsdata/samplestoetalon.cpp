@@ -27,11 +27,21 @@
 #include <QSplitter>
 #include <QDebug>
 
+#include <QGridLayout>
+#include <QFileDialog>
+#include <QHeaderView>
+
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
+
+using namespace QtCharts;
+
 SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
 {
     basicWindowTitle = tr("Samples ⟶ Etalon / Sample");
     setWindowTitle(basicWindowTitle);
-    customPlot = new QCustomPlot(this);
+    customPlot = new QtCharts::QChartView(new QChart());
     //customPlot->hide();
 
     table = new QTableWidget;
@@ -49,7 +59,6 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
     QWidget* window = new QWidget;
     window->setLayout(grid);
     setCentralWidget(window);
-
 
     // menu bar
     QAction * action {nullptr};
@@ -116,7 +125,7 @@ SamplesToEtalon::SamplesToEtalon(QWidget *parent) : QMainWindow(parent)
 
 SamplesToEtalon::~SamplesToEtalon()
 {
-    QString name = Parameters::global.settingsName();
+    QString name;//*** = Parameters::global.settingsName();
     if (!name.isEmpty()) {
         QSettings settings;
         settings.beginGroup(name);
@@ -190,53 +199,79 @@ void SamplesToEtalon::setCustomPlot()
     table->blockSignals(true);
 
     selected.clear();
-    customPlot->clearGraphs();
-    customPlot->xAxis->setLabel("wavelength");
-    customPlot->yAxis->setLabel("intensity");
-    customPlot->xAxis->setRange(xMin, xMax);
-    customPlot->yAxis->setRange(yMin, yMax);
 
-    int row {0};
-    unsigned igraph {0};
-    for (auto sp : etalon.samples())
+    QChart *chart = new QChart;
+    chart->legend()->hide();
+    chart->setTitle("Selected Samples");
+
+    unsigned row {0};
+    for (auto const sample : etalon.samples())
     {
         qDebug() << row << table->item(row,0)->checkState();
         if (table->item(row++,0)->checkState() == Qt::CheckState::Unchecked) continue;
 
-        selected.push_back(sp);
+        selected.push_back(sample);
 
-        /* http://www.qcustomplot.com
-         * --------------------------
-         */
-        customPlot->addGraph();
-        customPlot->graph(igraph)->setPen(QPen(Qt::lightGray));
-        customPlot->graph(igraph)->setData(sp->sdx, sp->sdy);
-        igraph++;
+        unsigned N = sample->sdx.size();
+        QLineSeries *series = new QLineSeries();
+        for (unsigned i=0; i<N; i++) {
+            double x = sample->sdx[i];
+            double y = sample->sdy[i];
+            series->append(x, y);
+        }
+        //series->setOpacity(0.7);
+        series->setColor(Qt::lightGray);
+        chart->addSeries(series);
     }
 
-    SpectralData a = selected.average();
-    customPlot->addGraph();
-    customPlot->graph(igraph)->setPen(QPen(Qt::darkBlue));
-    customPlot->graph(igraph++)->setData(a.sdx, a.sdy);
+    if (selected.samples().size() > 0) {
+        {
+            SpectralData sample = selected.average();
+            unsigned N = sample.sdx.size();
+            QLineSeries *series = new QLineSeries();
+            for (unsigned i=0; i<N; i++) {
+                double x = sample.sdx[i];
+                double y = sample.sdy[i];
+                series->append(x, y);
+            }
+            //series->setOpacity(0.7);
+            series->setColor(Qt::darkBlue);
+            chart->addSeries(series);
+        }
 
-    SpectralData b = selected.median();
-    customPlot->addGraph();
-    customPlot->graph(igraph)->setPen(QPen(Qt::green));
-    customPlot->graph(igraph++)->setData(b.sdx, b.sdy);
+        {
+            SpectralData sample = selected.median();
+            unsigned N = sample.sdx.size();
+            QLineSeries *series = new QLineSeries();
+            for (unsigned i=0; i<N; i++) {
+                double x = sample.sdx[i];
+                double y = sample.sdy[i];
+                series->append(x, y);
+            }
+            //series->setOpacity(0.7);
+            series->setColor(Qt::darkGreen);
+            chart->addSeries(series);
+        }
 
-    if (etalonsMinX > 0)
-    {
-        QCPItemLine* xminLine = new QCPItemLine(customPlot);
-        xminLine->start->setCoords(etalonsMinX, QCPRange::minRange);
-        xminLine->end  ->setCoords(etalonsMinX, QCPRange::maxRange);
-        QPen pen;
-        pen.setColor(Qt::red);
-        pen.setStyle(Qt::DotLine);
-        xminLine->setPen(pen);
+        auto roundX = [](double x) { return int(x/20)*20;};
+        chart->createDefaultAxes();
+        chart->axisX()->setMin(roundX(xMin));
+        chart->axisX()->setMax(roundX(xMax+20));
     }
 
-    customPlot->replot();
-    customPlot->show();
+    /*QValueAxis *axisX = new QValueAxis;
+    axisX->setRange((int(xMin)/100)*100, xMax);
+    //axisX->setTickCount(5);
+    axisX->setLabelFormat("%.0f");
+    chart->setAxisX(axisX, series);
+
+    QValueAxis *axisY = new QValueAxis;
+    axisY->setLabelFormat("%.0f");
+    chart->setAxisX(axisY, series);*/
+
+    delete customPlot->chart();
+    customPlot->setChart(chart);
+    customPlot->setRenderHint(QPainter::Antialiasing);
 
     table->blockSignals(false);
 }
