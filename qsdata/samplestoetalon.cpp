@@ -255,19 +255,13 @@ void SamplesToEtalon::setCustomPlot()
 
         auto roundX = [](double x) { return int(x/20)*20;};
         chart->createDefaultAxes();
-        chart->axisX()->setMin(roundX(xMin));
-        chart->axisX()->setMax(roundX(xMax+20));
+        // deprecated
+        // chart->axisX()->setMin(roundX(xMin));
+        // chart->axisX()->setMax(roundX(xMax+20));
+        auto axisX = chart->axes(Qt::Horizontal).back();
+        axisX->setMin(roundX(xMin));
+        axisX->setMax(roundX(xMax+20));
     }
-
-    /*QValueAxis *axisX = new QValueAxis;
-    axisX->setRange((int(xMin)/100)*100, xMax);
-    //axisX->setTickCount(5);
-    axisX->setLabelFormat("%.0f");
-    chart->setAxisX(axisX, series);
-
-    QValueAxis *axisY = new QValueAxis;
-    axisY->setLabelFormat("%.0f");
-    chart->setAxisX(axisY, series);*/
 
     delete customPlot->chart();
     customPlot->setChart(chart);
