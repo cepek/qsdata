@@ -28,6 +28,7 @@
 
 #include <limits>
 #include <memory>
+#include <cmath>
 #include <fstream>
 #include <QMenuBar>
 #include <QSettings>
@@ -416,7 +417,9 @@ void MainWindow::linearEtalonSearch()
                 sb += b*b;
                 ed += (a-b)*(a-b);
             }
-            double angle = std::acos(dp/std::sqrt(sa*sb))/M_PI*200;
+            // ??? M_PI is not implicitly available in Visual Studio ???
+            const double pi = std::atan2(0.0,-1.0);
+            double angle = std::acos(dp/std::sqrt(sa*sb))/pi*200;
             double dist  = std::sqrt(ed);
             list.push_back(std::make_tuple(angle, dist, table->item(c,0)->text()));
         }
