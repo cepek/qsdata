@@ -8,6 +8,7 @@
 #include <iterator>
 #include <sstream>
 #include <fstream>
+#include <cmath>
 #include <QDebug>
 
 std::vector<QVector<double>>  SpectralData::sdxList;

@@ -1,8 +1,8 @@
 #include "version.h"
 
-const unsigned Version::major_    {0};
-const unsigned Version::minor_    {9};
-const unsigned Version::revision_ {7};
+const unsigned Version::major_    {1};
+const unsigned Version::minor_    {0};
+const unsigned Version::revision_ {0};
 
 Version::Version()
 {

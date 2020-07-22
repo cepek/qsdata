@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 #                      endif
                        "</p>"
                        "<p>Built on " + __DATE__ + " " + __TIME__ + "</p>"
-                       "<p>Copyright (C) 2016 Aleš Čepek</p><p>"
+                       "<p>Copyright (C) 2016, 2020 Aleš Čepek</p><p>"
                        "License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;<br/>" +
                        "This is free software: you are free to change and redistribute it.<br/>" +
                        "There is NO WARRANTY, to the extent permitted by law.<p>"
